@@ -1,0 +1,12 @@
+[Maja_Inputs]
+repWork=/opt/maja-tmp
+repGipp=/data/MAJA-metadata/GIPP
+repMNT=/data/MAJA-metadata/DTM
+repL1=/data/MAJA-metadata/S2-L1C
+repL2=/data/MAJA-metadata/S2-L2A
+exeMaja=/opt/maja-precompiled/bin/maja
+repCAMS=/data/MAJA-metadata/CAMS
+
+[DTM_Creation]
+repRAW=/data/MAJA-metadata/DEM
+repGSW=/data/MAJA-metadata/GSW
