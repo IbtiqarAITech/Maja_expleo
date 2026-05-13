@@ -13,15 +13,16 @@
 #     - Python 3.8 environment (MAJA internal) with updated certifi
 #     - Geospatial Data Abstraction Library (GDAL) via MAJA environment
 #     - Example scripts for:
-#         * CAMS data download
+#         * ENSO satellite image download
 #         * DTM generation (DTMCreation.py)
 #         * MAJA L2A processing (startmaja)
 #
 # Expected Host Volumes :
-#   - /data/MAJA-metadata/CAMS   : CAMS auxiliary data
-#   - /data/MAJA-metadata/CDF    : Path to folder where netcdf data are stored (can be considered as a temporary file) 
+#   - /data/MAJA-metadata/CAMS   : CAMS auxiliary data (MAJA internal)
+#   - /data/MAJA-metadata/CDF    : Path to folder where netcdf data are stored (can be considered as a temporary file)
 #   - /data/MAJA-metadata/DEM    : DEM datasets
 #   - /data/MAJA-metadata/DTM    : Generated DTM products
+#   - /data/MAJA-metadata/ENSO   : Downloaded ENSO satellite images
 #   - /data/MAJA-metadata/GIPP   : MAJA GIPP configuration files
 #   - /data/MAJA-metadata/GSW    : Global Surface Water mask
 #   - /data/MAJA-metadata/LUT    : MAJA LUT files
@@ -33,7 +34,6 @@
 #   - The container is intended to be launched via run_maja_wrapper.sh.
 #   - The wrapper manages a persistent Docker volume "maja-home"
 #     mounted on /home/maja to preserve user files (e.g. ~/.cdsapirc).
-#   - A banner and CDSAPI configuration warning are displayed at shell login.
 #
 # Build Example :
 #   docker build --build-arg IMAGE_VERSION=1.0.0 -t relhirech/maja-env:1.0.0 .
@@ -50,7 +50,7 @@ LABEL org.opencontainers.image.version="4.10.0"
 LABEL org.opencontainers.image.description="Processing environment for MAJA L2A atmospheric correction from CNES/MAJA, including utilities from StartMaja and full metadata structure."
 LABEL org.opencontainers.image.source="https://gitlab.orfeo-toolbox.org/maja/maja"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
-LABEL volumes_required='["/data/MAJA-metadata/CAMS", "/data/MAJA-metadata/CDF", "/data/MAJA-metadata/DEM", "/data/MAJA-metadata/DTM", "/data/MAJA-metadata/GIPP", "/data/MAJA-metadata/GSW", "/data/MAJA-metadata/LUT", "/data/MAJA-metadata/S2-L1C", "/data/MAJA-metadata/S2-L2A", "/data/MAJA-metadata/tmp"]'
+LABEL volumes_required='["/data/MAJA-metadata/CAMS", "/data/MAJA-metadata/CDF", "/data/MAJA-metadata/DEM", "/data/MAJA-metadata/DTM", "/data/MAJA-metadata/ENSO", "/data/MAJA-metadata/GIPP", "/data/MAJA-metadata/GSW", "/data/MAJA-metadata/LUT", "/data/MAJA-metadata/S2-L1C", "/data/MAJA-metadata/S2-L2A", "/data/MAJA-metadata/tmp"]'
 
 # --------------------------------------------------------------
 # 1) Install system standard dependencies
@@ -86,6 +86,7 @@ RUN useradd -ms /bin/bash maja && \
     /data/MAJA-metadata/CDF \
     /data/MAJA-metadata/DEM \
     /data/MAJA-metadata/DTM \
+    /data/MAJA-metadata/ENSO \
     /data/MAJA-metadata/GIPP \
     /data/MAJA-metadata/GSW \
     /data/MAJA-metadata/LUT \
@@ -128,36 +129,30 @@ COPY --chown=maja:maja folder.txt /opt/maja-workspace
 RUN echo 'source /opt/maja-precompiled/bin/.majaenv.sh' >> /home/maja/.bashrc && \
     /opt/maja-precompiled/bin/python3.8 -m pip install --upgrade certifi
 
-# 4.2 - Install example scripts (camsdownload, dtmcreation, startmaja)
+# 4.2 - Install example scripts (enso download, dtmcreation, startmaja)
 
 COPY --chown=maja:maja 0_seed_example_safe.sh /opt/maja-workspace/0_seed_example_safe.sh
-COPY --chown=maja:maja 1_camsdownload_example.sh /opt/maja-workspace/1_camsdownload_example.sh
+COPY --chown=maja:maja 1_enso_download_example.sh /opt/maja-workspace/1_enso_download_example.sh
 COPY --chown=maja:maja 2_dtmcreation_example.sh /opt/maja-workspace/2_dtmcreation_example.sh
 COPY --chown=maja:maja 3_startmaja_example.sh /opt/maja-workspace/3_startmaja_example.sh
 COPY --chown=maja:maja README_EXAMPLES.md /opt/maja-workspace/README_EXAMPLES.md
 
 RUN chmod +x /opt/maja-workspace/*.sh
 
-# 4.3 - Global MAJA banner + CDSAPI config check
+# 4.3 - Global MAJA banner
 USER root
 
-RUN echo "${IMAGE_VERSION}" > /etc/maja_image_version 
+RUN echo "${IMAGE_VERSION}" > /etc/maja_image_version
 
 RUN cat << 'EOF' >> /etc/bash.bashrc
 
 if [ -t 1 ]; then
   echo
   echo "=========================================================="
-  echo "==========[ 🌍 MAJA Environment 4.10.0 - Ready ]=========="
-  echo "==============[ MAJA Image version : $(cat /etc/maja_image_version 2>/dev/null) ]=============="
+  echo "==========[ 🌍 MAJA 4.10.0 + ENSO - Ready ]=========="
+  echo "==============[ Image version : $(cat /etc/maja_image_version 2>/dev/null) ]=============="
   echo "=========================================================="
   echo
-  if [ ! -f "$HOME/.cdsapirc" ]; then
-    echo " ⚠️ Warning: CDSAPI configuration file ~/.cdsapirc is missing."
-    echo "  → You will not be able to download data from the Copernicus Climate Data Store (CAMS/CDS)."
-    echo "  → Please create the file ~/.cdsapirc with your CDS API key."
-    echo
-  fi
 fi
 
 EOF

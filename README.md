@@ -15,7 +15,8 @@ It includes:
    - MAJA 4.10.0 precompiled binaries
    - Python 3.8 (MAJA internal environment)
    - Required system tools
-   - Example scripts demonstrating CAMS download, DTM generation, and L2A processing
+   - Example scripts demonstrating ENSO satellite image download, DTM
+     generation, and L2A processing
    - An embedded Sentinel-2 L1C SAFE product for tile T31TCJ (Toulouse),
      stored under /opt/maja-workspace/example_data/
 
@@ -32,6 +33,7 @@ into the container via the wrapper script:
    - /data/MAJA-metadata/CDF
    - /data/MAJA-metadata/DEM
    - /data/MAJA-metadata/DTM
+   - /data/MAJA-metadata/ENSO
    - /data/MAJA-metadata/GIPP
    - /data/MAJA-metadata/GSW
    - /data/MAJA-metadata/LUT
@@ -39,8 +41,7 @@ into the container via the wrapper script:
    - /data/MAJA-metadata/S2-L2A
    - /data/MAJA-metadata/tmp
 
-Additionally, a persistent Docker volume named maja-home stores /home/maja,
-including the user’s ~/.cdsapirc.
+Additionally, a persistent Docker volume named maja-home stores /home/maja.
 
 --------------------------------------------------------
 3. Starting the Container
@@ -77,34 +78,95 @@ And if missing, copies it from:
 
 These example workflows are stored in /opt/maja-workspace.
 
-
-- 5.1 CAMS Download Example
+- 5.1 ENSO Satellite Image Download
 
 Run:
-./1_camsdownload_example.sh
-This script downloads CAMS data for a fixed date and requires a valid ~/.cdsapirc file.
-
+./1_enso_download_example.sh
+Downloads ENSO (ROB1E) satellite photos from the CNES/UMR server
+(https://ddp.csum.umontpellier.fr/rob1e/photos) into /data/MAJA-metadata/ENSO/.
 
 - 5.2 DTM Generation Example
 
 Run:
 ./2_dtmcreation_example.sh
-This script uses the SAFE deployed by 0_seed_example_safe.sh and generates a DTM for tile T31TCJ
-It writes outputs to:
-    /data/MAJA-metadata/DTM/T31TCJ
+Uses the SAFE deployed by 0_seed_example_safe.sh and generates a DTM for tile T31TCJ.
+Output: /data/MAJA-metadata/DTM/T31TCJ
 
 - 5.3 MAJA L2A Processing Example
 
 Run:
 ./3_startmaja_example.sh
-This script performs an L2A processing workflow using:
-   - folder.txt (MAJA configuration)
-   - the example L1C SAFE
-   - the generated DTM
+Performs L2A processing using folder.txt, the example L1C SAFE, and the generated DTM.
+Output: /data/MAJA-metadata/S2-L2A
 
-Outputs are written to:
-   /data/MAJA-metadata/S2-L2A
+--------------------------------------------------------
+6. Developer Toolkit (New in v1.1.0)
+--------------------------------------------------------
 
+Multi-agent CLI for code review, log debugging, profiling, and docs validation:
 
+  python -m tools.agents.agentctl review
+  python -m tools.agents.agentctl debug --logdir logs/
+  python -m tools.agents.agentctl profile
+  python -m tools.agents.agentctl docscheck --docsdir docs/
+  python -m tools.agents.agentctl all
 
+All agents produce JSON + Markdown reports under reports/<agent>/<timestamp>/.
 
+--------------------------------------------------------
+7. Batch Processing Runner (New in v1.1.0)
+--------------------------------------------------------
+
+Parallel MAJA job execution with file-lock safety and resume support:
+
+  python scripts/maja_batch.py examples/manifest.yml --workers 4
+  python scripts/maja_batch.py examples/manifest.json --dry-run
+  python scripts/maja_batch.py examples/manifest.yml --resume
+
+Output:
+  - logs/jobs/<job_id>.log           Per-job output
+  - logs/state/<name>_state.json     Resume state
+  - logs/locks/<name>.lockdir        Coordination lock directories
+  - reports/batch/<name>_<ts>.json   Summary report (JSON)
+  - reports/batch/<name>_<ts>.md     Summary report (Markdown)
+
+Manifests define job sequences with optional lock names and timeouts
+(see examples/manifest.yml or examples/manifest.json).
+
+--------------------------------------------------------
+8. ENSO Satellite Images (New in v1.1.0)
+--------------------------------------------------------
+
+Download ENSO satellite images for documentation (host-side):
+
+  python scripts/fetch_enso_images.py
+  python scripts/fetch_enso_images.py --dry-run
+
+Images saved to docs/assets/enso/.
+
+Inside the container, use:
+  ./1_enso_download_example.sh
+which downloads to /data/MAJA-metadata/ENSO/.
+
+--------------------------------------------------------
+9. CI Pipeline (New in v1.1.0)
+--------------------------------------------------------
+
+  - GitHub Actions: .github/workflows/ci.yml
+  - Python lint (py_compile) + pytest on 3.9-3.11
+  - ShellCheck on all shell scripts
+  - Markdown lint on all .md files
+
+Run tests locally:
+
+  pip install pytest pyyaml
+  python -m pytest tests/ -v
+
+--------------------------------------------------------
+10. Tests (New in v1.1.0)
+--------------------------------------------------------
+
+  tests/test_manifest.py    Manifest parsing & validation
+  tests/test_locking.py     File-lock acquire/release & concurrency
+  tests/test_resume.py      State cache persistence
+  tests/test_agents.py      Agent toolkit unit tests

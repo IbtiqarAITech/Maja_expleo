@@ -1,0 +1,31 @@
+{
+  "name": "maja-demo-batch",
+  "description": "Example MAJA L2A batch processing pipeline (JSON format)",
+  "version": "1.0",
+  "jobs": [
+    {
+      "id": "seed_safe",
+      "command": "./0_seed_example_safe.sh",
+      "lock": "metadata",
+      "timeout": 300
+    },
+    {
+      "id": "enso_download",
+      "command": "./1_enso_download_example.sh",
+      "lock": "enso",
+      "timeout": 600
+    },
+    {
+      "id": "dtm_creation",
+      "command": "./2_dtmcreation_example.sh",
+      "lock": "dtm",
+      "timeout": 900
+    },
+    {
+      "id": "maja_l2a",
+      "command": "./3_startmaja_example.sh",
+      "lock": "maja",
+      "timeout": 3600
+    }
+  ]
+}

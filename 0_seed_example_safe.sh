@@ -65,7 +65,7 @@ echo "Done. Example SAFE is now available under:"
 echo "  ${DST_SAFE_PATH}"
 echo
 echo "You can now run the example scripts:"
-echo "  ./1_camsdownload_example.sh"
+echo "  ./1_enso_download_example.sh"
 echo "  ./2_dtmcreation_example.sh"
 echo "  ./3_startmaja_example.sh"
 echo

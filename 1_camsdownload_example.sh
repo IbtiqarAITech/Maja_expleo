@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 # -----------------------------------------------------------------------------
-# Script Name          : 1_camsdownload_example.sh
+# Script Name          : 1_camsdownload_example.sh (DEPRECATED)
 # Version              : 1.0
-# Author               : Reda El Hirech - reda.el-hirech@expleogroup.com 
+# Author               : Reda El Hirech - reda.el-hirech@expleogroup.com
 # Date                 : 2025-12-10
 # Purpose              : Example CAMS download for MAJA (fixed parameters).
 # Tile area            : Toulouse, Haute-Garonne, FRANCE
-# Maja version         : 4.10.0 
+# Maja version         : 4.10.0
 # Docker image version : 1.0.0
 #
 # Notes:
-#   - This is only a demonstration script.
+#   - DEPRECATED in favour of 1_enso_download_example.sh.
+#   - Kept for backward compatibility only.
 #   - No parameters are taken.
 # -----------------------------------------------------------------------------
 
@@ -18,12 +19,15 @@ set -euo pipefail
 
 echo
 echo "================================================="
-echo "   Example: CAMS data download for MAJA 4.10.0   "
+echo "   [DEPRECATED] CAMS data download for MAJA      "
 echo "================================================="
 echo
 
-echo "This script downloads CAMS data for a fixed example date."
-echo "It is provided as a demonstration of camsdownload usage."
+echo "NOTE: This script is deprecated."
+echo "Please use 1_enso_download_example.sh instead."
+echo
+
+echo "Downloading CAMS data for fixed example date..."
 echo
 
 camsdownload \

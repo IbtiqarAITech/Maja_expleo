@@ -256,16 +256,17 @@ maja_create_metadata_tree() {
 	fi
 	
 	local base_dir_subdirs=(
-	    CAMS
-	    CDF
-	    DEM
-	    DTM
-	    GIPP
-	    GSW
-	    LUT
-	    S2-L1C
-	    S2-L2A
-	    tmp
+    CAMS
+    CDF
+    DEM
+    DTM
+    ENSO
+    GIPP
+    GSW
+    LUT
+    S2-L1C
+    S2-L2A
+    tmp
         )
 
 	for subdir in "${base_dir_subdirs[@]}"; do

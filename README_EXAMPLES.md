@@ -20,6 +20,7 @@ Before running the examples, please ensure that:
 
    - /data/MAJA-metadata/CAMS
    - /data/MAJA-metadata/CDF
+   - /data/MAJA-metadata/ENSO
    - /data/MAJA-metadata/DEM
    - /data/MAJA-metadata/DTM
    - /data/MAJA-metadata/GSW
@@ -29,11 +30,7 @@ Before running the examples, please ensure that:
    - /data/MAJA-metadata/S2-L2A
    - /data/MAJA-metadata/tmp
 
-2) A valid ~/.cdsapirc file must be in /home/maja
-   (on the persistent Docker volume "maja-home") if you want to
-   download CAMS data from the Copernicus Climate Data Store.
-
-3) The example Sentinel-2 L1C SAFE product must be deployed to the
+2) The example Sentinel-2 L1C SAFE product must be deployed to the
    host-mounted directory. This is done by running:
 
        ./0_seed_example_safe.sh
@@ -50,13 +47,13 @@ If these inputs are missing, the example scripts will fail.
 
 /opt/maja-workspace contains:
 
-   0_seed_example_safe.sh          → Deploys example .SAFE to the host
-   1_camsdownload_example.sh       → Example CAMS download
-   2_dtmcreation_example.sh        → Example DTM generation
-   3_startmaja_example.sh          → Example MAJA L2A processing
-   folder.txt                      → MAJA configuration file
-   README_EXAMPLES.txt             → This documentation
-   example_data/                   → Contains the embedded L1C SAFE structure
+    0_seed_example_safe.sh          → Deploys example .SAFE to the host
+    1_enso_download_example.sh      → Example ENSO satellite image download
+    2_dtmcreation_example.sh        → Example DTM generation
+    3_startmaja_example.sh          → Example MAJA L2A processing
+    folder.txt                      → MAJA configuration file
+    README_EXAMPLES.txt             → This documentation
+    example_data/                   → Contains the embedded L1C SAFE structure
 
 To list available scripts:
 
@@ -82,36 +79,34 @@ into:
 If the SAFE already exists on the host, nothing will be overwritten.
 
 --------------------------------------------------------
-4. Step 2 – CAMS data download
+4. Step 2 – ENSO Satellite Image Download
 --------------------------------------------------------
 
-Script  : 1_camsdownload_example.sh
-Purpose : Demonstrate how to download CAMS data for a fixed date.
+Script  : 1_enso_download_example.sh
+Purpose : Demonstrate how to download ENSO (ROB1E) satellite photos.
+
+Source  : https://ddp.csum.umontpellier.fr/rob1e/photos
 
 Command (inside container):
 
-   ./1_camsdownload_example.sh
+   ./1_enso_download_example.sh
 
-This script runs:
-
-   camsdownload \
-     -d 20251122 \
-     -f 20251122 \
-     -w /data/MAJA-metadata/CDF \
-     -a /data/MAJA-metadata/CAMS \
-     -p s2
+This script runs wget against the CNES/UMR server, parses the
+directory listing for .jpg image URLs, and downloads them.
 
 Behaviour:
 
-   - Downloads CAMS data for 2025-11-22.
-   - Stores intermediate CDF files in:
-       /data/MAJA-metadata/CDF
-   - Stores CAMS (archive DBL) data in:
-       /data/MAJA-metadata/CAMS
+   - Fetches the HTML directory listing from the ENSO photo server.
+   - Extracts all .jpg image URLs (handles both absolute and relative paths).
+   - Downloads new images to /data/MAJA-metadata/ENSO/.
+   - Skips images that already exist (idempotent).
 
-Note: A valid ~/.cdsapirc file is required to access the CDS API.
-More Info: check /opt/maja-precompiled/lib/python/StartMaja/cams_download/ (inside container)
-           Or run this command: camsdownload --help
+Output directory:
+
+   /data/MAJA-metadata/ENSO/
+
+Note: No API key or authentication is required.
+More Info: https://ddp.csum.umontpellier.fr/rob1e/photos
 
 --------------------------------------------------------
 5. Step 3 – DTM generation (DTMCreation.py)
@@ -194,6 +189,22 @@ More Info: startmaja --help
 
 - You are encouraged to copy and adapt these scripts to create
   your own production-ready workflows.
+
+========================================================
+8. Batch Processing All Steps (New in v1.1.0)
+========================================================
+
+All four example steps can be run as a parallel batch via:
+
+  python scripts/maja_batch.py examples/manifest.yml --workers 2
+
+Or sequentially with resume support:
+
+  python scripts/maja_batch.py examples/manifest.json --workers 1 --resume
+
+To preview without executing:
+
+  python scripts/maja_batch.py examples/manifest.yml --dry-run
 
 ========================================================
 End of README_EXAMPLES.md
