@@ -70,7 +70,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bzip2 \
     file \
     lsof \
+    python3 \
+    python3-pip \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m pip install --no-cache-dir pyyaml pytest && \
+    update-alternatives --install /usr/bin/python python python3 1
 
 # --------------------------------------------------------------
 # 2) Create user + core directories
@@ -110,7 +116,7 @@ RUN echo 'export PS1="maja@sentinel-2:\w\$ "' >> /home/maja/.bashrc
 # 3) Install MAJA precompiled binary
 # --------------------------------------------------------------
 # COPY --chown=maja:maja MAJA-4.10.0.zip /tmp/MAJA-4.10.0.zip
-
+# 
 # RUN unzip /tmp/MAJA-4.10.0.zip -d /tmp/maja-installer && \
 #     chmod +x /tmp/maja-installer/MAJA-4.10.0.run && \
 #     /tmp/maja-installer/MAJA-4.10.0.run --target /opt/maja-precompiled && \
@@ -126,8 +132,8 @@ SHELL ["/bin/bash", "-c"]
 # 4.1 - Source MAJA env in maja's shell + update certifi
 COPY --chown=maja:maja folder.txt /opt/maja-workspace
 
-# # RUN echo 'source /opt/maja-precompiled/bin/.majaenv.sh' >> /home/maja/.bashrc && \
-# #     /opt/maja-precompiled/bin/python3.8 -m pip install --upgrade certifi
+# RUN echo 'source /opt/maja-precompiled/bin/.majaenv.sh' >> /home/maja/.bashrc && \
+#     /opt/maja-precompiled/bin/python3.8 -m pip install --upgrade certifi
 
 # 4.2 - Install example scripts (enso download, dtmcreation, startmaja)
 
