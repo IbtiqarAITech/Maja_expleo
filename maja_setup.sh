@@ -3,8 +3,8 @@
 # -----------------------------------------------------------------------------
 # Script Name : maja_setup.sh
 # Version     : 1.0
-# Author      : Reda El Hirech - reda.el-hirech@expleogroup.com
-# Maintainer  : Reda El Hirech
+# Author      : Tarek ELOUARET - tarek.elouaret@expleogroup.com
+# Maintainer  : Tarek ELOUARET
 # Date        : 2025-12-18
 #
 # Description :  Setup and validation script for MAJA Docker environment.

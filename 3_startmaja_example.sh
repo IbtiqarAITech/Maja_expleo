@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # Script Name          : 3_startmaja_example.sh
 # Version              : 1.0
-# Author               : Reda El Hirech - reda.el-hirech@expleogroup.com
+# Author               : Tarek ELOUARET - tarek.elouaret@expleogroup.com
 # Date                 : 2025-12-10
 # Purpose              : Example MAJA L2A processing using startmaja.
 # Tile area            : Toulouse, Haute-Garonne, FRANCE

@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # Script Name          : 1_enso_download_example.sh
 # Version              : 1.0
-# Author               : Reda El Hirech - reda.el-hirech@expleogroup.com
+# Author               : Tarek ELOUARET - tarek.elouaret@expleogroup.com
 # Date                 : 2025-12-10
 # Purpose              : Example ENSO satellite image download (fixed parameters).
 # Source               : https://ddp.csum.umontpellier.fr/rob1e/photos

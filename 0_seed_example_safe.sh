@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # Script Name          : 0_seed_example_safe.sh
 # Version              : 1.0
-# Author               : Reda El Hirech - reda.el-hirech@expleogroup.com
+# Author               : Tarek ELOUARET - tarek.elouaret@expleogroup.com
 # Date                 : 2025-12-10
 # Purpose              : Copy the example Sentinel-2 L1C SAFE product from the image
 #                        into the host-mounted directory /data/MAJA-metadata/S2-L1C.

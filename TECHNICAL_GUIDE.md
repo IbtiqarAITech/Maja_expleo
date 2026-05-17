@@ -3,7 +3,7 @@
 **Version:** 1.1.0  
 **Base Technology:** MAJA 4.10.0 (Sentinel-2 L2A Atmospheric Correction)  
 **Repository:** `git@github.com:IbtiqarAITech/Maja_expleo.git`  
-**Maintainer:** Reda El Hirech <reda.el-hirech@expleogroup.com>
+**Maintainer:** Tarek ELOUARET <tarek.elouaret@expleogroup.com>
 
 ---
 

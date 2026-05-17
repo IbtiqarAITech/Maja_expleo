@@ -3,7 +3,7 @@
 # -----------------------------------------------------------------------------
 # Script Name : run_maja_wrapper.sh
 # Version     : 1.0
-# Author      : Reda El Hirech - reda.el-hirech@expleogroup.com
+# Author      : Tarek ELOUARET - tarek.elouaret@expleogroup.com
 # Date        : 2025-12-10
 #
 # Description:

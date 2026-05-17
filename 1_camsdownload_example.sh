@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------------------
 # Script Name          : 1_camsdownload_example.sh (DEPRECATED)
 # Version              : 1.0
-# Author               : Reda El Hirech - reda.el-hirech@expleogroup.com
+# Author               : Tarek ELOUARET - tarek.elouaret@expleogroup.com
 # Date                 : 2025-12-10
 # Purpose              : Example CAMS download for MAJA (fixed parameters).
 # Tile area            : Toulouse, Haute-Garonne, FRANCE

@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # Dockerfile  : maja-env
 # Version     : 1.0.0
-# Author      : Reda El Hirech - reda.el-hirech@expleogroup.com 
+# Author      : Tarek ELOUARET - tarek.elouaret@expleogroup.com
 # Date        : 2025-12-10
 #
 # Base Image  : ubuntu:20.04
@@ -42,7 +42,7 @@
 
 FROM ubuntu:20.04
 
-LABEL maintainer="Reda El Hirech - reda.el-hirech@expleogroup.com"
+LABEL maintainer="Tarek ELOUARET - tarek.elouaret@expleogroup.com"
 LABEL maja.version="4.10.0"
 LABEL description="MAJA 4.10.0 environment with Python 3.8 + GDAL + updated certifi. Ready for operational Sentinel-2 L2A processing."
 LABEL org.opencontainers.image.title="MAJA Processing Environment"
