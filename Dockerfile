@@ -103,18 +103,18 @@ RUN echo 'export PS1="maja@sentinel-2:\w\$ "' >> /home/maja/.bashrc
 # 2.1 - Example Sentinel-2 L1C product for tile T31TCJ (Toulouse)
 #       Included only for the MAJA 1.0.0 example image.
 
-COPY --chown=maja:maja S2A_MSIL1C_20251122T105401_N0511_R051_T31TCJ_20251122T132206.SAFE \
-  /opt/maja-workspace/example_data/S2-L1C/Toulouse/T31TCJ/S2A_MSIL1C_20251122T105401_N0511_R051_T31TCJ_20251122T132206.SAFE/
+# COPY --chown=maja:maja S2A_MSIL1C_20251122T105401_N0511_R051_T31TCJ_20251122T132206.SAFE \
+#   /opt/maja-workspace/example_data/S2-L1C/Toulouse/T31TCJ/S2A_MSIL1C_20251122T105401_N0511_R051_T31TCJ_20251122T132206.SAFE/
 
 # --------------------------------------------------------------
 # 3) Install MAJA precompiled binary
 # --------------------------------------------------------------
-COPY --chown=maja:maja MAJA-4.10.0.zip /tmp/MAJA-4.10.0.zip
+# COPY --chown=maja:maja MAJA-4.10.0.zip /tmp/MAJA-4.10.0.zip
 
-RUN unzip /tmp/MAJA-4.10.0.zip -d /tmp/maja-installer && \
-    chmod +x /tmp/maja-installer/MAJA-4.10.0.run && \
-    /tmp/maja-installer/MAJA-4.10.0.run --target /opt/maja-precompiled && \
-    rm -rf /tmp/MAJA-4.10.0.zip /tmp/maja-installer
+# RUN unzip /tmp/MAJA-4.10.0.zip -d /tmp/maja-installer && \
+#     chmod +x /tmp/maja-installer/MAJA-4.10.0.run && \
+#     /tmp/maja-installer/MAJA-4.10.0.run --target /opt/maja-precompiled && \
+#     rm -rf /tmp/MAJA-4.10.0.zip /tmp/maja-installer
 
 # --------------------------------------------------------------
 # 4) Prepare MAJA Python environment
@@ -126,8 +126,8 @@ SHELL ["/bin/bash", "-c"]
 # 4.1 - Source MAJA env in maja's shell + update certifi
 COPY --chown=maja:maja folder.txt /opt/maja-workspace
 
-RUN echo 'source /opt/maja-precompiled/bin/.majaenv.sh' >> /home/maja/.bashrc && \
-    /opt/maja-precompiled/bin/python3.8 -m pip install --upgrade certifi
+# # RUN echo 'source /opt/maja-precompiled/bin/.majaenv.sh' >> /home/maja/.bashrc && \
+# #     /opt/maja-precompiled/bin/python3.8 -m pip install --upgrade certifi
 
 # 4.2 - Install example scripts (enso download, dtmcreation, startmaja)
 
