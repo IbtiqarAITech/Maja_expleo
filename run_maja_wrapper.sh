@@ -29,7 +29,7 @@
 
 set -euo pipefail
 
-IMAGE_NAME="relhirech/maja-env:latest"
+IMAGE_NAME="tareelou/maja-env:latest"
 CONTAINER_NAME="maja-run"
 
 HOST_METADATA="/data/MAJA-metadata"

@@ -169,7 +169,7 @@ maja_check_update_latest() {
         echo "[MAJA-SETUP] === MAJA image update check (latest) ==="
 	echo
 
-        local image="relhirech/maja-env:latest"
+        local image="tareelou/maja-env:latest"
         local local_digest remote_digest
 
         remote_digest="$(get_remote_digest "$image")" 
@@ -195,7 +195,7 @@ maja_check_update_latest() {
 }
 
 maja_container_info() {
-	local image_name="relhirech/maja-env:latest"
+	local image_name="tareelou/maja-env:latest"
         container_info="$(docker ps -a \
                 --filter "name=^maja-run$" \
                 --format "{{.Names}}\t{{.ID}}\t{{.Status}}\t{{.Image}}" \
@@ -291,7 +291,7 @@ docker_info || exit 1
 maja_create_metadata_tree || exit 1
 maja_check_update_latest
 update_status=$?
-image_name="relhirech/maja-env:latest"
+image_name="tareelou/maja-env:latest"
 
 if [ "$update_status" -gt 1 ]; then # A pull has to be done
 	if [ "$update_status" -eq 20 ]; then # First install

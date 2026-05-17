@@ -36,7 +36,7 @@
 #     mounted on /home/maja to preserve user files (e.g. ~/.cdsapirc).
 #
 # Build Example :
-#   docker build --build-arg IMAGE_VERSION=1.0.0 -t relhirech/maja-env:1.0.0 .
+#   docker build --build-arg IMAGE_VERSION=1.0.0 -t tareelou/maja-env:1.0.0 .
 #
 # -----------------------------------------------------------------------------
 
