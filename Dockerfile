@@ -143,6 +143,11 @@ COPY --chown=maja:maja 2_dtmcreation_example.sh /opt/maja-workspace/2_dtmcreatio
 COPY --chown=maja:maja 3_startmaja_example.sh /opt/maja-workspace/3_startmaja_example.sh
 COPY --chown=maja:maja README_EXAMPLES.md /opt/maja-workspace/README_EXAMPLES.md
 
+COPY --chown=maja:maja tools /opt/maja-workspace/tools
+COPY --chown=maja:maja scripts /opt/maja-workspace/scripts
+COPY --chown=maja:maja tests /opt/maja-workspace/tests
+COPY --chown=maja:maja examples /opt/maja-workspace/examples
+
 RUN chmod +x /opt/maja-workspace/*.sh
 
 # 4.3 - Global MAJA banner
