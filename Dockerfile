@@ -76,7 +76,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install --no-cache-dir pyyaml pytest && \
-    update-alternatives --install /usr/bin/python python python3 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 # --------------------------------------------------------------
 # 2) Create user + core directories
