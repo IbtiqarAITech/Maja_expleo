@@ -81,6 +81,7 @@ else
 	docker run --pull=never -it \
 		--name "${CONTAINER_NAME}" \
 		-v "${HOST_METADATA}":/data/MAJA-metadata \
+		-v "${HOST_METADATA}/tmp":/opt/maja-tmp \
 		-v "${ETC_LOCAL_TIME}:${ETC_LOCAL_TIME}":ro \
 		-v "${ETC_TIME_ZONE}:${ETC_TIME_ZONE}":ro \
 		-v "${PERSISTENT_HOME}":/home/maja \
