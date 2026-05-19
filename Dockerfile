@@ -1,5 +1,3 @@
-# On the VM, rewrite the Dockerfile with this heredoc:
-cat > ~/maja-demo/Dockerfile << 'DOCKERFILE'
 # -----------------------------------------------------------------------------
 # Dockerfile  : maja-env
 # Version     : 1.0.0
@@ -177,4 +175,3 @@ USER maja
 # 5) Default command
 # --------------------------------------------------------------
 CMD ["bash", "-i"]
-DOCKERFILE
