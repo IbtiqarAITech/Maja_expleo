@@ -170,3 +170,93 @@ Run tests locally:
   tests/test_locking.py     File-lock acquire/release & concurrency
   tests/test_resume.py      State cache persistence
   tests/test_agents.py      Agent toolkit unit tests
+
+--------------------------------------------------------
+11. WP_02 ENSO Additions — Commands and Deliverables
+--------------------------------------------------------
+
+### Local setup
+```bash
+python -m pip install -r requirements.txt
+```
+
+### Existing MAJA demo
+Host-side container entry:
+```bash
+./run_maja_wrapper.sh
+```
+Inside the container:
+```bash
+./0_seed_example_safe.sh
+./2_dtmcreation_example.sh
+./3_startmaja_example.sh
+```
+The real MAJA command used by the demo is `startmaja -f /opt/maja-workspace/folder.txt -t T31TCJ -s Toulouse -d 2025-11-22 -e 2025-11-23`.
+
+### Multi-agent toolkit
+```bash
+python tools/agents/agentctl.py all
+python tools/agents/agentctl.py review
+python tools/agents/agentctl.py debug
+python tools/agents/agentctl.py profile
+python tools/agents/agentctl.py docscheck
+```
+Reports are written under `reports/`.
+
+### Batch dry run and execution
+```bash
+python scripts/maja_batch.py --manifest examples/maja_batch_manifest.yaml --workers 2 --dry-run
+python scripts/maja_batch.py --manifest examples/maja_batch_manifest.yaml --workers 2 --resume
+```
+The manifest supports YAML and JSON. Each job defines `id`, `command`, `output`, optional `working_dir`, `log_file`, `timeout`, `required_outputs`, and `enabled`.
+
+Resume skips only jobs with matching fingerprint, valid `.maja_batch_success.json`, required outputs and no active lock. Locks are per-job directory locks next to each working directory. Failed jobs preserve `.maja_batch_failure.json`.
+
+### ENSO image retrieval
+```bash
+python scripts/fetch_enso_images.py --output-dir docs/assets/enso --limit 10
+python scripts/fetch_enso_images.py --output-dir docs/assets/enso --limit 10 --dry-run
+```
+Source: https://ddp.csum.umontpellier.fr/rob1e/photos. Verify licensing before external publication. Documentation must reference local `docs/assets/enso/` files, not hotlinks.
+
+### Report/PDF generation
+```bash
+python scripts/build_reports.py
+```
+Outputs generated locally under `deliverables/`:
+- `deliverables/WP_02_Analyse_Besoins_Etude_Faisabilite.pdf`
+- `deliverables/Audit_Detaille_Amelioration_MAJA_ENSO.pdf`
+
+The PDF files are generated artifacts and are intentionally ignored by Git (`deliverables/*.pdf`). They are available after local execution, after Docker execution inside `deliverables/`, and as downloadable CI workflow artifacts. The authoritative version-controlled deliverables are the editable Markdown sources in `docs/reports/` plus the requirements documents in `docs/requirements/`.
+
+### Tests and lint
+```bash
+python -m py_compile scripts/*.py tools/agents/*.py
+pytest -q
+```
+ShellCheck is used in CI when available.
+
+### Docker commands
+```bash
+docker build -t maja-expleo:1.0.0 .
+docker image inspect maja-expleo:1.0.0
+docker run --rm -it \
+  -v "$(pwd)/data:/workspace/data" \
+  -v "$(pwd)/outputs:/workspace/outputs" \
+  -v "$(pwd)/logs:/workspace/logs" \
+  -v "$(pwd)/deliverables:/workspace/deliverables" \
+  maja-expleo:1.0.0 bash
+```
+If the MAJA ZIP or SAFE directory referenced by `Dockerfile` is absent, Docker build is blocked until those artifacts are supplied.
+
+### Output locations
+- MAJA products: `/data/MAJA-metadata/S2-L2A`
+- Batch outputs: `outputs/batch/`
+- Batch summaries: `outputs/batch/batch-summary.json` and `.md`
+- Job logs: `logs/maja-batch/`
+- Agent reports: `reports/`
+- ENSO assets: `docs/assets/enso/`
+- PDF deliverables: `deliverables/`
+
+### Known scientific limitations
+Successful execution does not prove ENSO scientific validity. Required stakeholder decisions: ENSO product format, angle representation, radiometric calibration, CAMS/ECMWF access, validation datasets, target quality thresholds and operational sizing.

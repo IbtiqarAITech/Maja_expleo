@@ -31,7 +31,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-REPORTS_DIR = Path("reports")
+REPORTS_DIR = Path(os.environ.get("MAJA_AGENT_REPORT_DIR", "reports"))
 
 
 def _ensure_dir(path: Path) -> Path:
@@ -279,6 +279,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         description="MAJA Multi-Agent Developer Toolkit",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    parser.add_argument("--output-dir", default=None)
+    parser.add_argument("--format", default="both", choices=["json", "md", "both"])
+    parser.add_argument("--target", default=None)
+    parser.add_argument("--config", default=None)
+    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--fail-on-error", action="store_true")
     sub = parser.add_subparsers(dest="agent", required=True)
 
     p_review = sub.add_parser("review", help="Static code review")
@@ -300,6 +306,9 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
 
 def main(argv: Optional[List[str]] = None) -> int:
     args = parse_args(argv)
+    global REPORTS_DIR
+    if args.output_dir:
+        REPORTS_DIR = Path(args.output_dir)
     agents = {
         "review": ReviewAgent(),
         "debug": DebugAgent(),

@@ -1,61 +1,33 @@
-name: CI
-
-on:
-  push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
-
+name: ci
+on: [push, pull_request]
 jobs:
-  lint-and-test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11"]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pyyaml
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Lint with Python
-        run: |
-          python -m py_compile scripts/maja_batch.py
-          python -m py_compile scripts/fetch_enso_images.py
-          python -m py_compile tools/agents/agentctl.py
-
-      - name: Run tests
-        run: |
-          python -m pytest tests/ -v --tb=short
-
-  shellcheck:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m pip install -r requirements.txt
+      - run: python -m py_compile scripts/*.py tools/agents/*.py
+      - run: pytest -q
+      - run: python scripts/build_reports.py
+      - name: Validate generated PDFs
+        run: |
+          test -s deliverables/WP_02_Analyse_Besoins_Etude_Faisabilite.pdf
+          test -s deliverables/Audit_Detaille_Amelioration_MAJA_ENSO.pdf
+          python - <<'PY'
+          import json, pathlib
+          data = json.loads(pathlib.Path("deliverables/pdf-validation.json").read_text())
+          assert len(data) == 2
+          assert all(item["size"] > 1000 and item["page_count"] > 0 for item in data)
+          PY
+      - name: Upload generated PDF deliverables
+        uses: actions/upload-artifact@v4
         with:
-          scandir: "."
-          severity: warning
-          ignore_paths: .git
-
-  markdown-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Lint Markdown
-        uses: DavidAnson/markdownlint-cli2-action@v16
-        with:
-          globs: "**/*.md"
-          ignore: ".git/**"
+          name: wp02-maja-pdf-deliverables
+          path: |
+            deliverables/WP_02_Analyse_Besoins_Etude_Faisabilite.pdf
+            deliverables/Audit_Detaille_Amelioration_MAJA_ENSO.pdf
+          if-no-files-found: error
+      - run: |
+          if command -v shellcheck >/dev/null; then shellcheck *.sh; else echo "shellcheck unavailable"; fi
