@@ -1,52 +1,78 @@
-# Maja_Git_2.0 — Project Plan & Entrypoint Analysis
+# PLAN — Audit et mise en œuvre WP_02 MAJA ENSO
 
-## Repository Overview
+## Structure du dépôt
+Dépôt plat Docker-first: scripts Bash racine, `Dockerfile`, `folder.txt`, modules Python `scripts/`, toolkit `tools/agents/`, tests `tests/`, exemples `examples/`, rapports `docs/reports`, exigences `docs/requirements`, livrables `deliverables`.
 
-Flat Docker-based MAJA 4.10.0 (Sentinel-2 L2A atmospheric correction) environment.
-Host-side scripts manage the container lifecycle; container-side scripts run MAJA workflows.
+## Architecture MAJA existante
+MAJA 4.10.0 est installé dans l'image Docker sous `/opt/maja-precompiled`; les données sont montées sous `/data/MAJA-metadata`; le workspace est `/opt/maja-workspace`.
 
-## Entrypoint Analysis
+## Entrées et flux existants
+| Component | Current entry point | Inputs | Outputs | Risks | Planned change |
+|---|---|---|---|---|---|
+| Setup hôte | `maja_setup.sh` | Docker, host dirs | arborescence `/data` | droits/stockage | documenter seulement |
+| Container | `run_maja_wrapper.sh` | image/volumes | shell conteneur | image absente | préserver |
+| Seed SAFE | `0_seed_example_safe.sh` | SAFE embarqué | S2-L1C | gros fichier non commité | préserver |
+| ENSO exemple | `1_enso_download_example.sh` | URL ROB1E | `/data/.../ENSO` | réseau/licence | outil host additif |
+| DTM | `2_dtmcreation_example.sh` | DEM/GSW/L1C | DTM | cache partagé | batch isolé |
+| MAJA L2A | `3_startmaja_example.sh` | `folder.txt`, L1C, DTM | S2-L2A | séquentiel | runner invoque commandes |
+| Config | `folder.txt` | chemins MAJA | paramètres | chemins fixes | préserver |
 
-### Host-Side Entrypoints (run on bare metal)
+## `folder.txt`
+`folder.txt` contient `[Maja_Inputs]` avec `repWork`, `repGipp`, `repMNT`, `repL1`, `repL2`, `exeMaja`, `repCAMS` et `[DTM_Creation]` avec DEM/GSW.
 
-| File | Role | Dependencies |
-|------|------|--------------|
-| `maja_setup.sh` | System validation (CPU/RAM/disk/Docker), metadata tree creation, image pull | `docker`, `lsblk`, `lscpu`, `free` |
-| `run_maja_wrapper.sh` | Container lifecycle: create/start/exec persistent `maja-run` container | `docker` |
+## Docker et VM
+Dockerfile Ubuntu 20.04, utilisateur `maja`, volumes `/data/MAJA-metadata/*`. VM supposée Linux avec Docker, CPU/RAM/disque suffisants et accès réseau/auxiliaires.
 
-### Container-Side Entrypoints (run inside Docker image)
+## Répertoires
+| Type | Path |
+|---|---|
+| Input L1 | `/data/MAJA-metadata/S2-L1C` |
+| Output L2 | `/data/MAJA-metadata/S2-L2A` |
+| CAMS | `/data/MAJA-metadata/CAMS` |
+| DTM | `/data/MAJA-metadata/DTM` |
+| Temp | `/data/MAJA-metadata/tmp`, `/opt/maja-tmp` |
+| Batch local | `outputs/batch`, `.work/maja-batch`, `logs/maja-batch` |
 
-| File | Role | Dependencies |
-|------|------|--------------|
-| `0_seed_example_safe.sh` | Copy example L1C SAFE from image to host mount | `cp`, `mkdir` |
-| `1_enso_download_example.sh` | Download ENSO satellite images for example date | `wget`, `grep` |
-| `2_dtmcreation_example.sh` | Generate DTM from DEM via DTMCreation.py | `python3.8`, `DTMCreation.py` |
-| `3_startmaja_example.sh` | Run MAJA L2A processing with `startmaja` | `startmaja` (MAJA binary), `folder.txt` |
+## Dépendances externes
+Docker, MAJA binaries, StartMaja, CAMS/ECMWF credentials or cache, DEM/GSW, network for ENSO.
 
-### Configuration
+## Tests/CI/documentation existants
+Tests Python partiels présents; CI GitHub Actions présent. Documentation initiale README/TECHNICAL_GUIDE/README_EXAMPLES.
 
-| File | Role |
-|------|------|
-| `folder.txt` | INI-style MAJA paths config (`[Maja_Inputs]`, `[DTM_Creation]`) |
-| `Dockerfile` | Image build: Ubuntu 20.04 + MAJA 4.10.0 + Python 3.8 |
-| `.gitignore` | Excludes large SAFE / MAJA zip from version control |
+## Risques concurrence
+`repWork`, caches CAMS/DTM, sorties L2, logs et configuration partagés. Mitigation: workdir, log, lock et output par job; rejet des conflits.
 
-## New Feature Map (this implementation)
+## Risques scientifiques
+Capteur ENSO, radiométrie, métadonnées d'angles, calibration, validation nuages/ombres et critères d'acceptation inconnus.
 
+## Diagramme état courant
+```mermaid
+flowchart LR
+Host-->Wrapper-->Docker-->Seed-->DTM-->StartMaja-->L2A
+Docker-->ENSOExample
 ```
-tools/agents/agentctl.py       Multi-agent dev toolkit (review, debug, profile, docscheck)
-scripts/maja_batch.py          Multiprocessing batch runner for MAJA
-scripts/fetch_enso_images.py   ENSO satellite image downloader
-tests/                         Unit tests for new Python modules
-.github/workflows/ci.yml       CI pipeline (lint + test + shellcheck)
-examples/                      Example manifests and configs
-docs/assets/enso/              Local ENSO satellite images
-reports/                       Agent report output directory
-logs/                          Batch runner log directory
+
+## Diagramme cible
+```mermaid
+flowchart LR
+Manifest-->Batch-->Lock
+Batch-->Workdir
+Batch-->MajaEntry
+MajaEntry-->Outputs
+Batch-->Summary
+Agents-->Reports
+ENSOFetch-->LocalAssets
+Markdown-->PDF
 ```
 
-## Architecture Decisions
+## Fichiers à ajouter/modifier
+Ajouts: exigences, rapports, build PDF, manifestes exemples, tests, CI, assets ENSO. Modifications: README, batch runner, ENSO fetcher, agent toolkit si nécessaire.
 
-1. **Parallelism**: `ProcessPoolExecutor` with file-lock coordination (`portalocker` or `fcntl`-style lock files) to prevent concurrent writes to shared DTM/ENSO directories.
-2. **Idempotency**: Per-job status tracking via JSON state files under `logs/`. On `--resume`, completed jobs are skipped.
-3. **Backward compatibility**: All new code is purely additive. Existing shell scripts, `folder.txt`, and Docker workflow are untouched.
+## Stratégie validation
+`python -m py_compile`, `pytest -q`, `python tools/agents/agentctl.py all`, `python scripts/maja_batch.py --manifest examples/maja_batch_manifest.yaml --dry-run`, intégration factice, `python scripts/build_reports.py`, Docker si archives requises disponibles.
+
+## Rollback
+Tous les changements sont additifs sauf améliorations de scripts Python existants. Retour possible par suppression des nouveaux répertoires/fichiers et restauration de `README.md`/scripts Python depuis Git.
+
+## Questions non résolues
+Format ENSO, licence images, accès CAMS/ECMWF, seuils scientifiques, ressources VM, disponibilité des archives Docker MAJA/SAFE.

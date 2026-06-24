@@ -1,3 +1,12 @@
 MAJA-4.10.0.zip
 S2A_MSIL1C_20251122T105401_N0511_R051_T31TCJ_20251122T132206.SAFE.zip/
 *.zip
+__pycache__/
+.pytest_cache/
+.work/
+outputs/
+logs/maja-batch/
+logs/jobs/
+logs/locks/
+
+deliverables/*.pdf
