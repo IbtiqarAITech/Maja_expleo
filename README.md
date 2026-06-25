@@ -261,6 +261,11 @@ If the MAJA ZIP or SAFE directory referenced by `Dockerfile` is absent, Docker b
 ### Known scientific limitations
 Successful execution does not prove ENSO scientific validity. Required stakeholder decisions: ENSO product format, angle representation, radiometric calibration, CAMS/ECMWF access, validation datasets, target quality thresholds and operational sizing.
 
+  
+  
+  
+  
+  
 --------------------------------------------------------
 12. Complete Docker launch-to-output checklist
 --------------------------------------------------------
