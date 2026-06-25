@@ -1,0 +1,30 @@
+version: 1
+name: example_safe_batch
+defaults:
+  output_root: outputs/batch
+  working_root: .work/maja-batch
+  log_root: logs/maja-batch
+  timeout_seconds: 60
+jobs:
+- id: enso_job_001
+  command:
+  - python
+  - /workspace/Maja_expleo/tests/fixtures/fake_maja.py
+  - --output
+  - /workspace/Maja_expleo/outputs/batch/enso_job_001
+  output: outputs/batch/enso_job_001
+  required_outputs:
+  - PRODUCT_OK.txt
+  - .maja_batch_success.json
+  enabled: true
+- id: enso_job_002
+  command:
+  - python
+  - /workspace/Maja_expleo/tests/fixtures/fake_maja.py
+  - --output
+  - /workspace/Maja_expleo/outputs/batch/enso_job_002
+  output: outputs/batch/enso_job_002
+  required_outputs:
+  - PRODUCT_OK.txt
+  - .maja_batch_success.json
+  enabled: true
